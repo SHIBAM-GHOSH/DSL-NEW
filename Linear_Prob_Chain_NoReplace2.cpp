@@ -1,76 +1,74 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 class HashTable {
-    int arr[10][2]; // [value, next index]
+    vector<pair<int, int>> table;  // Stores (value, next)
+    vector<int> lastIndex;  // Tracks last inserted index for each hash key
 
 public:
     HashTable() {
-        for (int i = 0; i < 10; i++) {
-            arr[i][0] = -1; // Initialize all slots as empty
-            arr[i][1] = -1; // No chaining initially
-        }
+        // Set table size to 10, initially all values are empty (-1)
+        table = vector<pair<int, int>>(10, {-1, -1});
+
+        // Set lastIndex size to 10, initially no values inserted (-1)
+        lastIndex = vector<int>(10, -1);
     }
 
     void insert(int num) {
         int key = num % 10;
+        cout << "\nInserting: " << num << " (Key: " << key << ")" << endl;
 
-        // Case 1: Slot is empty
-        if (arr[key][0] == -1) {
-            arr[key][0] = num;
-            arr[key][1] = -1; // No chaining needed for now
-            cout << "Inserted " << num << " at slot " << key << endl;
-            return;
+        int index = key;
+
+        // Find the next available slot using linear probing
+        while (table[index].first != -1) {
+            index = (index + 1) % 10;
         }
 
-        // Handle collisions with chaining (linear probing)
-        int currentKey = key;
-        while (arr[currentKey][1] != -1) {
-            currentKey = arr[currentKey][1]; // Move to the next slot in chain
+        // Insert value at the found index
+        table[index] = {num, -1};
+
+        // If there was a previous value with the same hash key, update its next pointer
+        if (lastIndex[key] != -1) {
+            table[lastIndex[key]].second = index;
         }
-        
-        // Try to find the next available empty slot to insert
-        int newKey = findNextEmptySlot(currentKey);
-        if (newKey != -1) {
-            arr[newKey][0] = num;
-            arr[currentKey][1] = newKey;  // Update the "next" pointer for the chain
-            arr[newKey][1] = -1; // End of chain
-            cout << "Inserted " << num << " at slot " << newKey << endl;
+
+        // Update last inserted index for this hash key
+        lastIndex[key] = index;
+
+        // Print placement message
+        if (index == key) {
+            cout << "Placed at slot " << index << " (No chaining needed)\n";
         } else {
-            cout << "Hash table is full!" << endl;
+            cout << "Placed at slot " << index << " (Chained from " << lastIndex[key] << ")\n";
         }
     }
 
     void display() {
-        cout << "Slot  Value   Next\n";
+        cout << "\nSlot | Value | Next\n";
+        cout << "--------------------\n";
         for (int i = 0; i < 10; i++) {
-            if (arr[i][0] == -1) {
-                cout << i << "  NULL -1\n"; // Empty slot
+            if (table[i].first == -1) {
+                cout << "  " << i << "  | NULL  | -1\n";
             } else {
-                cout << i << "  " << arr[i][0] << "   " << arr[i][1] << endl;
+                cout << "  " << i << "  |  " << table[i].first << "   | " << table[i].second << endl;
             }
         }
-    }
-
-private:
-    int findNextEmptySlot(int start) {
-        for (int i = (start + 1) % 10; i != start; i = (i + 1) % 10) {
-            if (arr[i][0] == -1) return i;  // Found empty slot
-        }
-        return -1; // No empty slot found
     }
 };
 
 int main() {
     HashTable h;
-    int arr[] = {22, 33, 44, 55, 52, 72, 45, 35}; // Test case array
-    int n = sizeof(arr) / sizeof(arr[0]);
 
-    for (int i = 0; i < n; i++) {
-        h.insert(arr[i]);
+    vector<int> testCases = {22, 32, 33, 44, 55, 52, 72, 45, 35};  // Test input
+
+    cout << "--- Inserting Elements ---\n";
+    for (int num : testCases) {
+        h.insert(num);
     }
 
-    h.display();  // Display the hash table content after insertion
+    h.display();  // Display the hash table
 
     return 0;
 }
