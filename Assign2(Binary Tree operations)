@@ -67,6 +67,26 @@ void preorder(node *root) {
     preorder(root->right);
 }
 
+// Function for inorder traversal
+void inorder(node *root) {
+    if (root == nullptr) {
+        return;
+    }
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
+}
+
+// Function for postorder traversal
+void postorder(node *root) {
+    if (root == nullptr) {
+        return;
+    }
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->data << " ";
+}
+
 // Function for level order traversal
 void level_order(node *root) {
     if (root == nullptr) {
@@ -154,10 +174,12 @@ void menu() {
         cout << "1. Insert\n";
         cout << "2. Display Level Order\n";
         cout << "3. Display Preorder\n";
-        cout << "4. Search\n";
-        cout << "5. Delete\n";
-        cout << "6. Height of Tree\n";
-        cout << "7. Exit\n";
+        cout << "4. Display Inorder\n";
+        cout << "5. Display Postorder\n";
+        cout << "6. Search\n";
+        cout << "7. Delete\n";
+        cout << "8. Height of Tree\n";
+        cout << "9. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
         switch (choice) {
@@ -176,29 +198,36 @@ void menu() {
                 cout << endl;
                 break;
             case 4:
-                cout << "Enter number to search: ";
-                cin >> num;
-                if (search(root, num))
-                    cout << "Found" << endl;
-                else
-                    cout << "Not Found" << endl;
+                cout << "Inorder Traversal: ";
+                inorder(root);
+                cout << endl;
                 break;
             case 5:
+                cout << "Postorder Traversal: ";
+                postorder(root);
+                cout << endl;
+                break;
+            case 6:
+                cout << "Enter number to search: ";
+                cin >> num;
+                cout << (search(root, num) ? "Found" : "Not Found") << endl;
+                break;
+            case 7:
                 cout << "Enter number to delete: ";
                 cin >> num;
                 root = dlt(root, num);
                 cout << "Node deleted." << endl;
                 break;
-            case 6:
+            case 8:
                 cout << "Height of Tree: " << height(root) << endl;
                 break;
-            case 7:
+            case 9:
                 cout << "Exiting..." << endl;
                 break;
             default:
                 cout << "Invalid choice! Please try again." << endl;
         }
-    } while (choice != 7);
+    } while (choice != 9);
 }
 
 // Main function
