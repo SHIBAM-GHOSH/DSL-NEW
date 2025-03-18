@@ -1,0 +1,208 @@
+#include<iostream>
+#include<queue>
+#include<vector>
+using namespace std;
+
+// Node structure for the BST
+class node {
+public:
+    int data;
+    node *left, *right;
+    node(int data) {
+        this->data = data;
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+};
+
+// Function to insert a node into BST
+void insert(node *&root, int num) {
+    node *n = new node(num);
+    if (root == nullptr) {
+        root = n;
+        return;
+    }
+    node *temp = root;
+    while (true) {
+        if (num < temp->data) {
+            if (temp->left == nullptr) {
+                temp->left = n;
+                break;
+            } else {
+                temp = temp->left;
+            }
+        } else {
+            if (temp->right == nullptr) {
+                temp->right = n;
+                break;
+            } else {
+                temp = temp->right;
+            }
+        }
+    }
+}
+
+// Function to create a BST from user input
+node *create() {
+    node *root = nullptr;
+    int num;
+    while (true) {
+        cout << "Enter the number you want to insert or enter -1 to exit: ";
+        cin >> num;
+        if (num == -1) {
+            break;
+        }
+        insert(root, num);
+    }
+    return root;
+}
+
+// Function for preorder traversal
+void preorder(node *root) {
+    if (root == nullptr) {
+        return;
+    }
+    cout << root->data << " ";
+    preorder(root->left);
+    preorder(root->right);
+}
+
+// Function for level order traversal
+void level_order(node *root) {
+    if (root == nullptr) {
+        return;
+    }
+    queue<node*> q;
+    q.push(root);
+    q.push(nullptr);
+    while (!q.empty()) {
+        node *temp = q.front();
+        q.pop();
+        if (temp != nullptr) {
+            cout << temp->data << " ";
+            if (temp->left != nullptr) q.push(temp->left);
+            if (temp->right != nullptr) q.push(temp->right);
+        } else {
+            cout << endl;
+            if (!q.empty()) q.push(nullptr);
+        }
+    }
+}
+
+// Function to find height of the BST
+int height(node *root) {
+    if (root == nullptr) {
+        return 0;
+    }
+    return 1 + max(height(root->left), height(root->right));
+}
+
+// Function to search an element in BST
+bool search(node *root, int num) {
+    if (root == nullptr) {
+        return false;
+    }
+    if (root->data == num) {
+        return true;
+    } 
+    if (num < root->data) {
+        return search(root->left, num);
+    } 
+    return search(root->right, num);
+}
+
+// Function to find minimum node in BST
+node *find_min(node *root) {
+    while (root->left != nullptr) {
+        root = root->left;
+    }
+    return root;
+}
+
+// Function to delete a node from BST
+node *dlt(node *root, int num) {
+    if (root == nullptr) {
+        return nullptr;
+    }
+    if (num < root->data) {
+        root->left = dlt(root->left, num);
+    } else if (num > root->data) {
+        root->right = dlt(root->right, num);
+    } else {
+        if (root->left == nullptr) {
+            node *temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == nullptr) {
+            node *temp = root->left;
+            delete root;
+            return temp;
+        }
+        node *temp = find_min(root->right);
+        root->data = temp->data;
+        root->right = dlt(root->right, temp->data);
+    }
+    return root;
+}
+
+// Menu-driven function
+void menu() {
+    node *root = nullptr;
+    int choice, num;
+    do {
+        cout << "\nBinary Search Tree Operations:\n";
+        cout << "1. Insert\n";
+        cout << "2. Display Level Order\n";
+        cout << "3. Display Preorder\n";
+        cout << "4. Search\n";
+        cout << "5. Delete\n";
+        cout << "6. Height of Tree\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                cout << "Enter number to insert: ";
+                cin >> num;
+                insert(root, num);
+                break;
+            case 2:
+                cout << "Level Order Traversal:\n";
+                level_order(root);
+                break;
+            case 3:
+                cout << "Preorder Traversal: ";
+                preorder(root);
+                cout << endl;
+                break;
+            case 4:
+                cout << "Enter number to search: ";
+                cin >> num;
+                if (search(root, num))
+                    cout << "Found" << endl;
+                else
+                    cout << "Not Found" << endl;
+                break;
+            case 5:
+                cout << "Enter number to delete: ";
+                cin >> num;
+                root = dlt(root, num);
+                cout << "Node deleted." << endl;
+                break;
+            case 6:
+                cout << "Height of Tree: " << height(root) << endl;
+                break;
+            case 7:
+                cout << "Exiting..." << endl;
+                break;
+            default:
+                cout << "Invalid choice! Please try again." << endl;
+        }
+    } while (choice != 7);
+}
+
+// Main function
+int main() {
+    menu();
+    return 0;
+}
